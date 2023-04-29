@@ -1,9 +1,3 @@
-export const keyReload = (e) => {
-	if (e.key === 'Enter' || e.key === ' ') {
-		reload();
-	}
-};
-
 export function spin(node, options) {
 	const { times = 1 } = options;
 	return {
