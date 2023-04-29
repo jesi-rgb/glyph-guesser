@@ -5,6 +5,7 @@
 
 	import { spin } from '$lib/utils/utils.js';
 	import { fonts } from '$lib/fonts.js';
+	import { onMount } from 'svelte';
 
 	let options = { duration: 300, easing: cubicOut };
 
@@ -13,8 +14,7 @@
 	let fontIndex = Math.floor(Math.random() * fonts.length);
 
 	$: selectedChar = charSet[charIndex];
-	let selectedFont = fonts[fontIndex];
-	$: selectedFont = selectedFont;
+	$: selectedFont = fonts[fontIndex];
 
 	let selectedCharKey = {};
 	let spinKey = {};
@@ -28,42 +28,48 @@
 	};
 
 	const keyReload = (e) => {
-		console.log(e);
 		if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
 			reload();
 		}
 	};
 
-	console.log(fontIndex, selectedFont);
+	$: fontName = selectedFont.family;
+	$: fontUrl = selectedFont.files['regular'];
 
-	let fontName = selectedFont.family;
-	let fontUrl = selectedFont.files['regular'];
-	let fontFace = `
-@font-face {
-  font-family: ${fontName}
-  font-style: normal;
-  src: local('${fontName}'), url(${fontUrl}) format('ttf');
-};
-`;
-	let glyphStyle = fontFace + `font-family: "${fontName}";`;
-	$: console.log(glyphStyle);
+	$: if (document) {
+		document.fonts.add(new FontFace(fontName, `url(${fontUrl})`));
+	}
+
+	let visible = false;
+	onMount(() => {
+		const font = new FontFace(fontName, `url(${fontUrl})`);
+		document.fonts.add(font);
+		visible = true;
+	});
 </script>
+
+{#if visible}
+	<div in:fly={{ y: 100, duration: 1000 }} class="flex flex-col items-center">
+		{#key selectedCharKey}
+			<div
+				in:fly={{ y: 20 }}
+				class="glyph text-9xl max-w-sm mx-auto text-center my-20"
+				style:font-family={fontName}
+			>
+				{selectedChar}
+			</div>
+		{/key}
+		<div>{fontName}</div>
+		{#key spinKey}
+			<button on:click={reload} in:spin={options} class="text-3xl font-semibold"
+				><ArrowCounterClockwise weight="bold" size={40} /></button
+			>
+		{/key}
+	</div>
+{/if}
 
 <svelte:head>
 	<title>Font Guesser</title>
-	<link href={fontUrl} as="font" type="font/ttf" crossorigin="anonymous" />
 </svelte:head>
 
-<div class="flex flex-col items-center">
-	{#key selectedCharKey}
-		<div in:fly={{ y: 20 }} class="text-9xl max-w-sm mx-auto text-center my-20" style={glyphStyle}>
-			{selectedChar}
-		</div>
-	{/key}
-	{#key spinKey}
-		<button on:click={reload} in:spin={options} class="text-3xl font-semibold"
-			><ArrowCounterClockwise weight="bold" size={40} /></button
-		>
-	{/key}
-</div>
 <svelte:window on:keypress|preventDefault={keyReload} />
