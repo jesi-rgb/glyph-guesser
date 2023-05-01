@@ -67,12 +67,27 @@
 	}
 
 	function loadFont(fontName, fontUrls) {
-		console.log(selectedFont);
 		for (const [key, value] of Object.entries(fontUrls)) {
 			if (!key.match(/\D/g) || key === 'regular') {
 				// console.log(key, value);
-				const font = new FontFace(fontName, `url(${value})`, { weight: key });
+				// https://bugzilla.mozilla.org/show_bug.cgi?id=1706648
+				// this ended up being a different error: when passing the weight,
+				// 'regular' was being used and that causes problems. we need to make sure
+				// the weights are only numbers.
+				const font = new FontFace(`\"${fontName}\"`, `url(${value})`, {
+					weight: key === 'regular' ? '400' : key
+				});
 				document.fonts.add(font);
+
+				font.load().then(
+					() => {
+						// selectedCharKey = {};
+						// console.log('succesfully loaded font: ', font);
+					},
+					(e) => {
+						console.log('error loading font: ', fontName, font, e);
+					}
+				);
 			}
 		}
 	}
