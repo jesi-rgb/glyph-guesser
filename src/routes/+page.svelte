@@ -82,7 +82,7 @@
 				font.load().then(
 					() => {
 						// selectedCharKey = {};
-						// console.log('succesfully loaded font: ', font);
+						console.log('succesfully loaded font: ', font);
 					},
 					(e) => {
 						console.log('error loading font: ', fontName, font, e);
@@ -127,12 +127,12 @@
 		<div>
 			{#key spinReloadChar}
 				<button on:click={reloadChar} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={40} /></button
+					><ArrowCounterClockwise weight="bold" size={100} /></button
 				>
 			{/key}
 			{#key spinReloadFont}
 				<button on:click={reloadFont} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={40} /></button
+					><ArrowCounterClockwise weight="bold" size={100} /></button
 				>
 			{/key}
 		</div>
@@ -141,6 +141,7 @@
 
 <svelte:head>
 	<title>Font Guesser</title>
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
 </svelte:head>
 
 <svelte:window on:keypress|preventDefault={keyReload} />
