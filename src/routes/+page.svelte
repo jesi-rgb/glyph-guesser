@@ -1,6 +1,6 @@
 <script>
 	import { fly, fade } from 'svelte/transition';
-	import { cubicOut } from 'svelte/easing';
+	import { cubicOut, backOut, bounceOut } from 'svelte/easing';
 	import { ArrowCounterClockwise } from 'phosphor-svelte';
 
 	import { spin } from '$lib/utils/utils.js';
@@ -8,18 +8,32 @@
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
 
-	let options = { duration: 300, easing: cubicOut };
+	let options = {
+		duration: 700,
+		easing: (x) => {
+			const c1 = 0.78;
+			const c3 = c1 + 1;
+
+			return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+		}
+	};
 
 	let charSet = 'abcdefghijklmnopqrstuvwxyz1234567890.,:;-';
 	let charIndex = Math.floor(Math.random() * charSet.length);
 	let fontIndex = Math.floor(Math.random() * fonts.length);
 
-	$: selectedChar = charSet[charIndex];
-	$: selectedFont = fonts[fontIndex];
-
 	let selectedCharKey = {};
 	let spinReloadChar = {};
 	let spinReloadFont = {};
+
+	let fontWeight = 400;
+	let visible = false;
+
+	$: selectedChar = charSet[charIndex];
+	$: selectedFont = fonts[fontIndex];
+
+	$: fontUrls = selectedFont.files;
+	$: fontName = selectedFont.family;
 
 	const reloadFont = () => {
 		charIndex = Math.floor(Math.random() * charSet.length);
@@ -75,7 +89,8 @@
 				// 'regular' was being used and that causes problems. we need to make sure
 				// the weights are only numbers.
 				const font = new FontFace(`\"${fontName}\"`, `url(${value})`, {
-					weight: key === 'regular' ? '400' : key
+					weight: key === 'regular' ? '400' : key,
+					format: 'woff2'
 				});
 				document.fonts.add(font);
 
@@ -92,13 +107,6 @@
 		}
 	}
 
-	$: fontUrls = selectedFont.files;
-	$: fontName = selectedFont.family;
-
-	let fontWeight = 700;
-
-	let visible = false;
-
 	$: if (visible) {
 		loadFont(fontName, fontUrls);
 	}
@@ -114,10 +122,11 @@
 		{#key selectedCharKey}
 			<div
 				in:fly={{ y: 20, duration: 500 }}
-				class="glyph max-w-sm mx-auto text-center my-20"
 				style:font-family={fontName}
+				class="glyph max-w-sm mx-auto text-center my-20"
 				style:font-weight={fontWeight}
 				style:font-size={'200px'}
+				style="font-family: {fontName};"
 			>
 				{selectedChar}
 			</div>
