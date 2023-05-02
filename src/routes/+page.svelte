@@ -1,8 +1,14 @@
 <script>
-	import { fly } from 'svelte/transition';
+	import { slide, fly } from 'svelte/transition';
 	import { ArrowCounterClockwise, TextAa } from 'phosphor-svelte';
 
-	import { spin, niceBounce, generateRandomOptions, randomChoice } from '$lib/utils/utils.js';
+	import {
+		spin,
+		niceBounce,
+		generateRandomOptions,
+		randomChoice,
+		horizontalSlide
+	} from '$lib/utils/utils.js';
 	// import { fonts } from '$lib/fonts.js';
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
@@ -172,14 +178,18 @@
 			<div on:click={reloadChar} class="relative w-1/2 border py-3">
 				<div class="w-max mx-auto" in:spin={options}>
 					<ArrowCounterClockwise weight="bold" size={60} />
-					New Word
+				</div>
+				<div class="w-max mx-auto flex-col items-center text-center">
+					<p>New Word</p>
 				</div>
 			</div>
 		{/key}
 		{#key spinReloadFont}
-			<div on:click={reloadChar} class="relative w-1/2 border py-3">
-				<div class="w-max mx-auto flex-col items-center text-center" in:spin={options}>
+			<div on:click={reloadFont} class="relative w-1/2 border py-3">
+				<div class="w-max mx-auto flex-col items-center text-center" in:slide={{ duration: 500 }}>
 					<TextAa weight="bold" size={60} />
+				</div>
+				<div class="w-max mx-auto flex-col items-center text-center">
 					<p>New Font</p>
 				</div>
 			</div>
