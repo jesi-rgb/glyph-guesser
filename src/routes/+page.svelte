@@ -40,7 +40,7 @@
 	$: fontUrls = selectedFont.files;
 	$: fontName = selectedFont.family;
 
-	const reloadFont = () => {
+	const reloadFont = (e) => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
 		selectedFont = randomChoice(fonts);
 		loadWord();
@@ -51,7 +51,7 @@
 		e.preventDefault();
 	};
 
-	const reloadChar = () => {
+	const reloadChar = (e) => {
 		charIndex = Math.floor(Math.random() * charSet.length);
 
 		selectedCharKey = {};
