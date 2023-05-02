@@ -13,6 +13,13 @@ export function spin(node, options) {
 	};
 }
 
+export const niceBounce = (x) => {
+	const c1 = 0.78;
+	const c3 = c1 + 1;
+
+	return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
+};
+
 export function getXHeight(font) {
 	const text = 'ax';
 	const canvas = document.querySelector('canvas');
