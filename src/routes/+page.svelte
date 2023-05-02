@@ -2,14 +2,7 @@
 	import { slide, fly } from 'svelte/transition';
 	import { ArrowCounterClockwise, TextAa } from 'phosphor-svelte';
 
-	import {
-		spin,
-		niceBounce,
-		generateRandomOptions,
-		randomChoice,
-		horizontalSlide
-	} from '$lib/utils/utils.js';
-	// import { fonts } from '$lib/fonts.js';
+	import { spin, niceBounce, generateRandomOptions, randomChoice } from '$lib/utils/utils.js';
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
 	import ButtonPanel from '../lib/Components/ButtonPanel.svelte';

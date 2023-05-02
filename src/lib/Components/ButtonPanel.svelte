@@ -1,4 +1,5 @@
 <script>
+	import { fly } from 'svelte/transition';
 	import Button from './Button.svelte';
 
 	export let fontNames = ['a', 'b', 'c'];
