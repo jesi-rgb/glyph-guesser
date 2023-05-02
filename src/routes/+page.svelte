@@ -7,6 +7,7 @@
 	// import { fonts } from '$lib/fonts.js';
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
+	import Button from '../lib/Components/Button.svelte';
 
 	let options = {
 		duration: 700,
@@ -24,14 +25,25 @@
 	let fontWeight = 400;
 	let visible = false;
 
-	$: selectedChar = charSet[charIndex];
+	let selectedChar = 'loading...';
+	let wordStack = ['lets begin'];
+
+	const loadWord = async () => {
+		selectedChar = wordStack.pop();
+		if (wordStack.length <= 2) {
+			let object = await fetch('https://random-word-api.vercel.app/api?words=15');
+			let json = await object.json();
+			wordStack = [...json, ...wordStack];
+		}
+	};
+
 	$: selectedFont = fonts[fontIndex];
 
 	$: fontUrls = selectedFont.files;
 	$: fontName = selectedFont.family;
 
 	const reloadFont = () => {
-		charIndex = Math.floor(Math.random() * charSet.length);
+		// charIndex = Math.floor(Math.random() * charSet.length);
 		fontIndex = Math.floor(Math.random() * fonts.length);
 
 		selectedCharKey = {};
@@ -43,6 +55,7 @@
 
 		selectedCharKey = {};
 		spinReloadChar = {};
+		loadWord();
 	};
 
 	const keyReload = (e) => {
@@ -89,7 +102,6 @@
 				});
 
 				// let font = new FontFace(`\"${fontName}\"`, `url(${createFontUrl(selectedFont)})`);
-
 				document.fonts.add(font);
 
 				font.load().then(
@@ -111,6 +123,7 @@
 
 	onMount(() => {
 		loadFont(fontName, fontUrls);
+		loadWord();
 		visible = true;
 	});
 
@@ -133,7 +146,7 @@
 			<div
 				on:wheel={resizeText}
 				on:scroll={resizeText}
-				in:fly={{ y: 20, duration: 400, easing: niceBounce }}
+				in:fly={{ y: 20, duration: 500, easing: niceBounce }}
 				class="overflow-x-scroll select-none mx-auto text-center my-20"
 				style:font-weight={fontWeight}
 				style:font-size={'200px'}
@@ -142,9 +155,8 @@
 				{selectedChar}
 			</div>
 		{/key}
-		<div>{fontName}</div>
-		<input type="range" min={100} max={900} bind:value={fontWeight} />
-		<div>
+		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
+		<div class="my-10">
 			{#key spinReloadChar}
 				<button on:click={reloadChar} in:spin={options} class="text-3xl font-semibold"
 					><ArrowCounterClockwise weight="bold" size={100} /></button
@@ -156,6 +168,11 @@
 				>
 			{/key}
 		</div>
+	</div>
+	<div class="max-w-sm mx-auto flex flex-col space-y-6 justify-evenly">
+		<Button text={fontName} />
+		<Button text={'eah'} />
+		<Button text={'sadfa'} />
 	</div>
 {/if}
 
