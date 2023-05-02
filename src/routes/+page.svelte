@@ -132,6 +132,7 @@
 		{#key selectedCharKey}
 			<div
 				on:wheel={resizeText}
+				on:scroll={resizeText}
 				in:fly={{ y: 20, duration: 400, easing: niceBounce }}
 				class="overflow-x-scroll select-none mx-auto text-center my-20"
 				style:font-weight={fontWeight}
