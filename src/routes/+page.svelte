@@ -13,7 +13,7 @@
 	};
 
 	let charSet = 'abcdefghijklmnopqrstuvwxyz1234567890.,:;-';
-	let charIndex = randomChoice(charSet);
+	// let charIndex = randomChoice(charSet);
 	let selectedFont = randomChoice(fonts);
 
 	let selectedCharKey = {};
