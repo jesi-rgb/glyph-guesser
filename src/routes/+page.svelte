@@ -1,6 +1,6 @@
 <script>
 	import { fly } from 'svelte/transition';
-	import { ArrowCounterClockwise } from 'phosphor-svelte';
+	import { ArrowCounterClockwise, TextAa } from 'phosphor-svelte';
 
 	import { spin, niceBounce, generateRandomOptions, randomChoice } from '$lib/utils/utils.js';
 	// import { fonts } from '$lib/fonts.js';
@@ -48,6 +48,8 @@
 
 		selectedCharKey = {};
 		spinReloadFont = {};
+
+		e.preventDefault();
 	};
 
 	const reloadChar = () => {
@@ -55,7 +57,10 @@
 
 		selectedCharKey = {};
 		spinReloadChar = {};
+
 		loadWord();
+
+		e.preventDefault();
 	};
 
 	const keyReload = (e) => {
@@ -158,19 +163,27 @@
 			</div>
 		{/key}
 		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
-		<div class="my-10 text-stone-700">
-			{#key spinReloadChar}
-				<button on:click={reloadChar} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={60} /></button
-				>
-			{/key}
-			{#key spinReloadFont}
-				<button on:click={reloadFont} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={60} /></button
-				>
-			{/key}
+		<div class="mt-40">
+			<ButtonPanel fontNames={fontOptions} correctOption={fontName} />
 		</div>
-		<ButtonPanel fontNames={fontOptions} correctOption={fontName} />
+	</div>
+	<div class="text-stone-700 w-screen flex fixed bottom-0">
+		{#key spinReloadChar}
+			<div on:click={reloadChar} class="relative w-1/2 border py-3">
+				<div class="w-max mx-auto" in:spin={options}>
+					<ArrowCounterClockwise weight="bold" size={60} />
+					New Word
+				</div>
+			</div>
+		{/key}
+		{#key spinReloadFont}
+			<div on:click={reloadChar} class="relative w-1/2 border py-3">
+				<div class="w-max mx-auto flex-col items-center text-center" in:spin={options}>
+					<TextAa weight="bold" size={60} />
+					<p>New Font</p>
+				</div>
+			</div>
+		{/key}
 	</div>
 {/if}
 
