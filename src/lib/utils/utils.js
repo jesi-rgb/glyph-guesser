@@ -13,6 +13,35 @@ export function spin(node, options) {
 	};
 }
 
+// https://stackoverflow.com/a/65638217/12024715
+export function shuffle(t) {
+	let last = t.length;
+	let n;
+	while (last > 0) {
+		n = rand(last);
+		swap(t, n, --last);
+	}
+}
+const rand = (n) => 0 | (Math.random() * n);
+
+function swap(t, i, j) {
+	let q = t[i];
+	t[i] = t[j];
+	t[j] = q;
+	return t;
+}
+
+export function randomChoice(arr) {
+	return arr[Math.floor(Math.random() * arr.length)];
+}
+
+export const generateRandomOptions = (fonts, selectedFont) => {
+	let options = [randomChoice(fonts).family, randomChoice(fonts).family, selectedFont.family];
+	shuffle(options);
+
+	return options;
+};
+
 export const niceBounce = (x) => {
 	const c1 = 0.78;
 	const c3 = c1 + 1;

@@ -1,13 +1,12 @@
 <script>
-	import { fly, fade } from 'svelte/transition';
-	import { cubicOut, backOut, bounceOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
 	import { ArrowCounterClockwise } from 'phosphor-svelte';
 
-	import { spin, niceBounce } from '$lib/utils/utils.js';
+	import { spin, niceBounce, generateRandomOptions, randomChoice } from '$lib/utils/utils.js';
 	// import { fonts } from '$lib/fonts.js';
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
-	import Button from '../lib/Components/Button.svelte';
+	import ButtonPanel from '../lib/Components/ButtonPanel.svelte';
 
 	let options = {
 		duration: 700,
@@ -15,8 +14,8 @@
 	};
 
 	let charSet = 'abcdefghijklmnopqrstuvwxyz1234567890.,:;-';
-	let charIndex = Math.floor(Math.random() * charSet.length);
-	let fontIndex = Math.floor(Math.random() * fonts.length);
+	let charIndex = randomChoice(charSet);
+	let selectedFont = randomChoice(fonts);
 
 	let selectedCharKey = {};
 	let spinReloadChar = {};
@@ -28,6 +27,8 @@
 	let selectedChar = 'loading...';
 	let wordStack = ['lets begin'];
 
+	let fontOptions;
+
 	const loadWord = async () => {
 		selectedChar = wordStack.pop();
 		if (wordStack.length <= 2) {
@@ -37,14 +38,13 @@
 		}
 	};
 
-	$: selectedFont = fonts[fontIndex];
-
 	$: fontUrls = selectedFont.files;
 	$: fontName = selectedFont.family;
 
 	const reloadFont = () => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
-		fontIndex = Math.floor(Math.random() * fonts.length);
+		selectedFont = randomChoice(fonts);
+		loadWord();
 
 		selectedCharKey = {};
 		spinReloadFont = {};
@@ -115,6 +115,8 @@
 				);
 			}
 		}
+		fontOptions = generateRandomOptions(fonts, selectedFont);
+		console.log(fontOptions);
 	}
 
 	$: if (visible) {
@@ -147,32 +149,28 @@
 				on:wheel={resizeText}
 				on:scroll={resizeText}
 				in:fly={{ y: 20, duration: 500, easing: niceBounce }}
-				class="overflow-x-scroll select-none mx-auto text-center my-20"
+				class="select-none mx-auto text-center text-stone-700"
 				style:font-weight={fontWeight}
-				style:font-size={'200px'}
+				style:font-size={'80px'}
 				style={`--font-name: "${fontName}"; font-family: ${fontName};`}
 			>
 				{selectedChar}
 			</div>
 		{/key}
 		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
-		<div class="my-10">
+		<div class="my-10 text-stone-700">
 			{#key spinReloadChar}
 				<button on:click={reloadChar} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={100} /></button
+					><ArrowCounterClockwise weight="bold" size={60} /></button
 				>
 			{/key}
 			{#key spinReloadFont}
 				<button on:click={reloadFont} in:spin={options} class="text-3xl font-semibold"
-					><ArrowCounterClockwise weight="bold" size={100} /></button
+					><ArrowCounterClockwise weight="bold" size={60} /></button
 				>
 			{/key}
 		</div>
-	</div>
-	<div class="max-w-sm mx-auto flex flex-col space-y-6 justify-evenly">
-		<Button text={fontName} />
-		<Button text={'eah'} />
-		<Button text={'sadfa'} />
+		<ButtonPanel fontNames={fontOptions} correctOption={fontName} />
 	</div>
 {/if}
 
