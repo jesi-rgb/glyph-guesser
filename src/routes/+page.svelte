@@ -113,14 +113,27 @@
 		loadFont(fontName, fontUrls);
 		visible = true;
 	});
+
+	const resizeText = (e) => {
+		e.preventDefault();
+		if (e.wheelDeltaX <= -10 && selectedChar.length > 1) {
+			// we are scrolling left, remove chars
+			selectedChar = selectedChar.slice(0, selectedChar.length - 1);
+		}
+
+		if (e.wheelDeltaX >= 10) {
+			selectedChar += charSet[Math.floor(Math.random() * charSet.length)];
+		}
+	};
 </script>
 
 {#if visible}
 	<div in:fly={{ y: 100, duration: 1500 }} class="flex flex-col items-center">
 		{#key selectedCharKey}
 			<div
+				on:wheel={resizeText}
 				in:fly={{ y: 20, duration: 400, easing: niceBounce }}
-				class="max-w-sm mx-auto text-center my-20"
+				class="overflow-x-scroll select-none mx-auto text-center my-20"
 				style:font-weight={fontWeight}
 				style:font-size={'200px'}
 				style={`--font-name: "${fontName}"; font-family: ${fontName};`}
