@@ -169,7 +169,7 @@
 			</div>
 		{/key}
 		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
-		<div class="mt-40">
+		<div class="my-20">
 			<ButtonPanel fontNames={fontOptions} correctOption={fontName} />
 		</div>
 	</div>
