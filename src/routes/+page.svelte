@@ -28,26 +28,31 @@
 
 	let fontOptions;
 
-	const loadWord = async () => {
+	const fetchWords = async () => {
 		selectedChar = wordStack.pop();
 		if (wordStack.length <= 2) {
 			let object = await fetch('https://random-word-api.vercel.app/api?words=15');
 			let json = await object.json();
 			wordStack = [...json, ...wordStack];
 		}
-		spinReloadChar = {};
 	};
 
 	$: fontUrls = selectedFont.files;
 	$: fontName = selectedFont.family;
 
+	const reloadWord = () => {
+		fetchWords();
+		spinReloadChar = {};
+		selectedCharKey = {};
+	};
+
 	const reloadFont = () => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
 		selectedFont = randomChoice(fonts);
-		loadWord();
+		fetchWords();
 
-		selectedCharKey = {};
 		spinReloadFont = {};
+		selectedCharKey = {};
 	};
 
 	const reloadChar = () => {
@@ -56,18 +61,16 @@
 		selectedCharKey = {};
 		spinReloadChar = {};
 
-		loadWord();
+		reloadWord();
 	};
 
 	const keyReload = (e) => {
 		if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
-			loadWord();
+			reloadWord();
 		}
 		if (e.key === 'Space' || e.key === 'f' || e.key === 'F') {
 			reloadFont();
 		}
-
-		e.preventDefault();
 	};
 
 	function createFontUrl(fontObject) {
@@ -128,7 +131,7 @@
 
 	onMount(() => {
 		loadFont(fontName, fontUrls);
-		loadWord();
+		reloadWord();
 		visible = true;
 	});
 
@@ -149,8 +152,6 @@
 	<div in:fly={{ y: 100, duration: 1500 }} class="flex flex-col items-center">
 		{#key selectedCharKey}
 			<div
-				on:wheel={resizeText}
-				on:scroll={resizeText}
 				in:fly={{ y: 20, duration: 500, easing: niceBounce }}
 				class="select-none mx-auto text-center text-stone-700"
 				style:font-weight={fontWeight}
@@ -167,7 +168,7 @@
 	</div>
 	<div class="text-stone-700 w-screen flex fixed bottom-0">
 		{#key spinReloadChar}
-			<div on:click={reloadChar} class="relative w-1/2 border py-3">
+			<div on:click={reloadWord} class="relative w-1/2 border py-3">
 				<div class="w-max mx-auto" in:spin={options}>
 					<ArrowCounterClockwise weight="bold" size={60} />
 				</div>
