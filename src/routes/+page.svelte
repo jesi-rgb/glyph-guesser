@@ -35,40 +35,39 @@
 			let json = await object.json();
 			wordStack = [...json, ...wordStack];
 		}
+		spinReloadChar = {};
 	};
 
 	$: fontUrls = selectedFont.files;
 	$: fontName = selectedFont.family;
 
-	const reloadFont = (e) => {
+	const reloadFont = () => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
 		selectedFont = randomChoice(fonts);
 		loadWord();
 
 		selectedCharKey = {};
 		spinReloadFont = {};
-
-		e.preventDefault();
 	};
 
-	const reloadChar = (e) => {
+	const reloadChar = () => {
 		charIndex = Math.floor(Math.random() * charSet.length);
 
 		selectedCharKey = {};
 		spinReloadChar = {};
 
 		loadWord();
-
-		e.preventDefault();
 	};
 
 	const keyReload = (e) => {
 		if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
-			reloadChar();
+			loadWord();
 		}
 		if (e.key === 'Space' || e.key === 'f' || e.key === 'F') {
 			reloadFont();
 		}
+
+		e.preventDefault();
 	};
 
 	function createFontUrl(fontObject) {
