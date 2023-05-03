@@ -51,42 +51,38 @@ export const niceBounce = (x) => {
 	return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2);
 };
 
-export function getXHeight(font) {
-	const text = 'ax';
+export function typewriter(node, { speed = 1 }) {
+	const valid = node.childNodes.length === 1 && node.childNodes[0].nodeType === Node.TEXT_NODE;
+
+	if (!valid) {
+		throw new Error(`This transition only works on elements with a single text node child`);
+	}
+
+	const text = node.textContent;
+	const duration = text.length / (speed * 0.01);
+
+	return {
+		duration,
+		tick: (t) => {
+			const i = Math.trunc(text.length * t);
+			node.textContent = text.slice(0, i);
+		}
+	};
+}
+
+export function getXHeight(fontFace, fontSize = 12) {
 	const canvas = document.querySelector('canvas');
-	canvas.width = 500;
-	canvas.height = 400;
+	const context = canvas.getContext('2d');
 
-	const ctx = canvas.getContext('2d');
-	const fontSize = 100;
+	// font is not being applied. a default font is being used and that causes problems
+	// we'll see!
 
-	ctx.font = `${fontSize}px ${fontName}`;
-	// top is critical to the fillText() calculation
-	// you can use other positions, but you need to adjust the calculation
+	context.font = `${fontSize}px ${fontFace}`;
 
-	// ctx.textBaseline = 'top';
-	// ctx.textAlign = 'center';
-	const metrics = ctx.measureText(text);
-	const width = metrics.width;
-	const actualHeight = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
-	// fallback to using fontSize if fontBoundingBoxAscent isn't available, like in Firefox. Should be close enough that you aren't more than a pixel off in most cases.
-	const fontHeight = metrics.fontBoundingBoxAscent + metrics.fontBoundingBoxDescent ?? fontSize;
-	console.log(metrics.actualBoundingBoxAscent);
+	context.fillText('x', 100, 100);
 
-	ctx.textAlign = 'left';
-	ctx.textBaseline = 'alphabetical';
-
-	ctx.font = `${fontSize}px ${fontName}`;
-	ctx.fillText('ax', width / 2, height / 2);
-	ctx.beginPath(); //
-	ctx.moveTo(0, height / 2);
-	ctx.lineTo(150, height / 2);
-	ctx.lineWidth = 1;
-	ctx.stroke();
-
-	ctx.beginPath(); //
-	ctx.moveTo(0, metrics.actualBoundingBoxAscent);
-	ctx.lineTo(150, metrics.actualBoundingBoxAscent);
-	ctx.lineWidth = 1;
-	ctx.stroke();
+	// Draw an "x" on the canvas
+	const xText = 'x';
+	const metrics = context.measureText(xText);
+	return metrics.actualBoundingBoxAscent;
 }

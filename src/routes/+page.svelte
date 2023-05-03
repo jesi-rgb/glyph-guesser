@@ -1,11 +1,20 @@
 <script>
-	import { slide, fly } from 'svelte/transition';
+	import { draw, slide, fly, fade } from 'svelte/transition';
+	import { cubicIn } from 'svelte/easing';
 	import { ArrowCounterClockwise, TextAa } from 'phosphor-svelte';
 
-	import { spin, niceBounce, generateRandomOptions, randomChoice } from '$lib/utils/utils.js';
+	import {
+		spin,
+		niceBounce,
+		typewriter,
+		generateRandomOptions,
+		randomChoice,
+		getXHeight
+	} from '$lib/utils/utils.js';
 	import { fonts } from '$lib/fonts.js';
 	import { onMount } from 'svelte';
 	import ButtonPanel from '../lib/Components/ButtonPanel.svelte';
+	import Glyph from '../lib/Components/Glyph.svelte';
 
 	let options = {
 		duration: 700,
@@ -21,15 +30,16 @@
 	let spinReloadFont = {};
 
 	let fontWeight = 400;
+	let fontSize = 80;
 	let visible = false;
 
-	let selectedChar = 'loading...';
-	let wordStack = ['lets begin'];
+	let selectedWord = 'loading...';
+	let wordStack = ['x'];
 
 	let fontOptions;
 
 	const fetchWords = async () => {
-		selectedChar = wordStack.pop();
+		selectedWord = wordStack.pop();
 		if (wordStack.length <= 2) {
 			let object = await fetch('https://random-word-api.vercel.app/api?words=15');
 			let json = await object.json();
@@ -74,6 +84,8 @@
 	};
 
 	function createFontUrl(fontObject) {
+		console.log(fontObject);
+
 		let apiUrl = [];
 
 		apiUrl.push('https://fonts.googleapis.com/css2?family=');
@@ -113,7 +125,7 @@
 				font.load().then(
 					() => {
 						// selectedCharKey = {};
-						console.log('succesfully loaded font: ', font);
+						// console.log('succesfully loaded font: ', font);
 					},
 					(e) => {
 						console.log('error loading font: ', fontName, font, e);
@@ -122,44 +134,86 @@
 			}
 		}
 		fontOptions = generateRandomOptions(fonts, selectedFont);
-		console.log(fontOptions);
+		// console.log(fontOptions);
 	}
 
 	$: if (visible) {
 		loadFont(fontName, fontUrls);
 	}
 
+	let xHeight;
 	onMount(() => {
 		loadFont(fontName, fontUrls);
 		reloadWord();
 		visible = true;
+		xHeight = getXHeight(fontName, fontSize);
 	});
+
+	$: console.log(xHeight);
 
 	const resizeText = (e) => {
 		e.preventDefault();
-		if (e.wheelDeltaX <= -10 && selectedChar.length > 1) {
+		if (e.wheelDeltaX <= -10 && selectedWord.length > 1) {
 			// we are scrolling left, remove chars
-			selectedChar = selectedChar.slice(0, selectedChar.length - 1);
+			selectedWord = selectedWord.slice(0, selectedWord.length - 1);
 		}
 
 		if (e.wheelDeltaX >= 10) {
-			selectedChar += charSet[Math.floor(Math.random() * charSet.length)];
+			selectedWord += charSet[Math.floor(Math.random() * charSet.length)];
 		}
 	};
+
+	let width = 500,
+		height = 200;
 </script>
 
 {#if visible}
 	<div in:fly={{ y: 100, duration: 1500 }} class="flex flex-col items-center">
 		{#key selectedCharKey}
-			<div
-				in:fly={{ y: 20, duration: 500, easing: niceBounce }}
-				class="select-none mx-auto text-center text-stone-700"
-				style:font-weight={fontWeight}
-				style:font-size={'80px'}
-				style={`--font-name: "${fontName}"; font-family: ${fontName};`}
-			>
-				{selectedChar}
-			</div>
+			<!-- <Glyph> -->
+			<!-- 	<div -->
+			<!-- 		in:fly={{ y: 20, duration: 500, easing: niceBounce }} -->
+			<!-- 		class="select-none w-screen mx-auto text-center text-stone-600" -->
+			<!-- 		style:font-weight={fontWeight} -->
+			<!-- 		style:font-size={'80px'} -->
+			<!-- 		style={`--font-name: "${fontName}"; font-family: ${fontName};`} -->
+			<!-- 	> -->
+
+			<!-- 		{selectedChar} -->
+			<!-- 	</div> -->
+			<Glyph>
+				<svg {width} {height} viewBox="0 0 {width} {fontSize}" class="">
+					<text
+						text-anchor="middle"
+						dominant-baseline="baseline"
+						x={width / 2}
+						y={height / 2}
+						in:typewriter={{ speed: 1.3, easing: cubicIn }}
+						class="select-none w-screen mx-auto text-center text-stone-600"
+						style:font-weight={fontWeight}
+						style:font-size={`${fontSize}px`}
+						style={`--font-name: "${fontName}"; font-family: ${fontName};`}
+					>
+						{selectedWord}
+					</text>
+					<line
+						in:draw={{ easing: niceBounce, duration: 600, delay: 400 }}
+						x1="0"
+						y1={height / 2}
+						x2={width}
+						y2={height / 2}
+						class="stroke-black"
+					/>
+					<line
+						in:draw={{ easing: niceBounce, duration: 600, delay: 400 }}
+						x1="0"
+						y1={xHeight}
+						x2={width}
+						y2={xHeight}
+						class="stroke-black"
+					/>
+				</svg>
+			</Glyph>
 		{/key}
 		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
 		<div class="my-20">
@@ -189,6 +243,8 @@
 		{/key}
 	</div>
 {/if}
+
+<canvas class="w-[200px] h-[200px] border" />
 
 <svelte:head>
 	<title>Font Guesser</title>
