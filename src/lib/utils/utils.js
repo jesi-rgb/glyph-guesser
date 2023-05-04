@@ -70,19 +70,26 @@ export function typewriter(node, { speed = 1 }) {
 	};
 }
 
-export function getXHeight(fontFace, fontSize = 12) {
+export function getXHeight(selectedFont, word = 'damn', fontSize = 12) {
 	const canvas = document.querySelector('canvas');
 	const context = canvas.getContext('2d');
+
+	let metrics;
 
 	// font is not being applied. a default font is being used and that causes problems
 	// we'll see!
 
-	context.font = `${fontSize}px ${fontFace}`;
+	context.font = `${fontSize}px ${selectedFont.family}`;
 
-	context.fillText('x', 100, 100);
+	context.clearRect(0, 0, canvas.width, canvas.height);
+	context.fillText(word, 50, 100);
 
 	// Draw an "x" on the canvas
-	const xText = 'x';
-	const metrics = context.measureText(xText);
-	return metrics.actualBoundingBoxAscent;
+	metrics = context.measureText('x');
+	const xHeight = metrics.actualBoundingBoxAscent;
+
+	const descender = context.measureText('yjgpqfQ').actualBoundingBoxDescent;
+	const ascender = context.measureText('AMYTEdl1I').actualBoundingBoxAscent;
+
+	return { xHeight: xHeight, ascender: ascender, descender: descender };
 }

@@ -25,9 +25,9 @@
 	// let charIndex = randomChoice(charSet);
 	let selectedFont = randomChoice(fonts);
 
-	let selectedCharKey = {};
+	let updateWordKey = {};
 	let spinReloadChar = {};
-	let spinReloadFont = {};
+	let updateFontKey = {};
 
 	let fontWeight = 400;
 	let fontSize = 80;
@@ -37,6 +37,7 @@
 	let wordStack = ['x'];
 
 	let fontOptions;
+	let xHeight, ascender, descender;
 
 	const fetchWords = async () => {
 		selectedWord = wordStack.pop();
@@ -53,22 +54,25 @@
 	const reloadWord = () => {
 		fetchWords();
 		spinReloadChar = {};
-		selectedCharKey = {};
+		updateWordKey = {};
 	};
 
 	const reloadFont = () => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
 		selectedFont = randomChoice(fonts);
 		fetchWords();
+		xHeight = getXHeight(selectedFont, selectedWord, fontSize).xHeight;
+		ascender = getXHeight(selectedFont, selectedWord, fontSize).ascender;
+		descender = getXHeight(selectedFont, selectedWord, fontSize).descender;
 
-		spinReloadFont = {};
-		selectedCharKey = {};
+		updateFontKey = {};
+		updateWordKey = {};
 	};
 
 	const reloadChar = () => {
 		charIndex = Math.floor(Math.random() * charSet.length);
 
-		selectedCharKey = {};
+		updateWordKey = {};
 		spinReloadChar = {};
 
 		reloadWord();
@@ -78,7 +82,7 @@
 		if (e.key === 'Enter' || e.key === 'r' || e.key === 'R') {
 			reloadWord();
 		}
-		if (e.key === 'Space' || e.key === 'f' || e.key === 'F') {
+		if (e.key === ' ' || e.key === 'f' || e.key === 'F') {
 			reloadFont();
 		}
 	};
@@ -126,6 +130,9 @@
 					() => {
 						// selectedCharKey = {};
 						// console.log('succesfully loaded font: ', font);
+						xHeight = getXHeight(selectedFont, selectedWord, fontSize).xHeight;
+						descender = getXHeight(selectedFont, selectedWord, fontSize).descender;
+						ascender = getXHeight(selectedFont, selectedWord, fontSize).ascender;
 					},
 					(e) => {
 						console.log('error loading font: ', fontName, font, e);
@@ -141,15 +148,11 @@
 		loadFont(fontName, fontUrls);
 	}
 
-	let xHeight;
 	onMount(() => {
 		loadFont(fontName, fontUrls);
 		reloadWord();
 		visible = true;
-		xHeight = getXHeight(fontName, fontSize);
 	});
-
-	$: console.log(xHeight);
 
 	const resizeText = (e) => {
 		e.preventDefault();
@@ -169,52 +172,74 @@
 
 {#if visible}
 	<div in:fly={{ y: 100, duration: 1500 }} class="flex flex-col items-center">
-		{#key selectedCharKey}
-			<!-- <Glyph> -->
-			<!-- 	<div -->
-			<!-- 		in:fly={{ y: 20, duration: 500, easing: niceBounce }} -->
-			<!-- 		class="select-none w-screen mx-auto text-center text-stone-600" -->
-			<!-- 		style:font-weight={fontWeight} -->
-			<!-- 		style:font-size={'80px'} -->
-			<!-- 		style={`--font-name: "${fontName}"; font-family: ${fontName};`} -->
-			<!-- 	> -->
+		<!-- <Glyph> -->
+		<!-- 	<div -->
+		<!-- 		in:fly={{ y: 20, duration: 500, easing: niceBounce }} -->
+		<!-- 		class="select-none w-screen mx-auto text-center text-stone-600" -->
+		<!-- 		style:font-weight={fontWeight} -->
+		<!-- 		style:font-size={'80px'} -->
+		<!-- 		style={`--font-name: "${fontName}"; font-family: ${fontName};`} -->
+		<!-- 	> -->
 
-			<!-- 		{selectedChar} -->
-			<!-- 	</div> -->
-			<Glyph>
-				<svg {width} {height} viewBox="0 0 {width} {fontSize}" class="">
-					<text
-						text-anchor="middle"
-						dominant-baseline="baseline"
-						x={width / 2}
-						y={height / 2}
-						in:typewriter={{ speed: 1.3, easing: cubicIn }}
-						class="select-none w-screen mx-auto text-center text-stone-600"
-						style:font-weight={fontWeight}
-						style:font-size={`${fontSize}px`}
-						style={`--font-name: "${fontName}"; font-family: ${fontName};`}
-					>
-						{selectedWord}
-					</text>
+		<!-- 		{selectedChar} -->
+		<!-- 	</div> -->
+		<Glyph>
+			{#key updateFontKey}
+				<svg {width} {height} viewBox="0 0 {width} {height}">
+					{#key updateWordKey}
+						<text
+							text-anchor="middle"
+							dominant-baseline="baseline"
+							x={width / 2}
+							y={height / 2}
+							in:typewriter={{ speed: 1.3, easing: cubicIn }}
+							class="fill-stone-800"
+							style:font-weight={fontWeight}
+							style:font-size={`${fontSize}px`}
+							style={`--font-name: "${fontName}"; font-family: ${fontName};`}
+						>
+							{selectedWord}
+						</text>
+					{/key}
 					<line
-						in:draw={{ easing: niceBounce, duration: 600, delay: 400 }}
+						in:draw={{ easing: niceBounce, duration: 600, delay: 100 }}
+						x1="0"
+						y1={height / 2 - ascender}
+						x2={width}
+						y2={height / 2 - ascender}
+						stroke="black"
+						stroke-opacity=".3"
+					/>
+					<line
+						in:draw={{ easing: niceBounce, duration: 600, delay: 200 }}
+						x1="0"
+						y1={height / 2 - xHeight}
+						x2={width}
+						y2={height / 2 - xHeight}
+						stroke="black"
+						stroke-opacity=".3"
+					/>
+					<line
+						in:draw={{ easing: niceBounce, duration: 600, delay: 300 }}
 						x1="0"
 						y1={height / 2}
 						x2={width}
 						y2={height / 2}
-						class="stroke-black"
+						stroke="black"
+						stroke-opacity=".3"
 					/>
 					<line
 						in:draw={{ easing: niceBounce, duration: 600, delay: 400 }}
 						x1="0"
-						y1={xHeight}
+						y1={height / 2 + descender}
 						x2={width}
-						y2={xHeight}
-						class="stroke-black"
+						y2={height / 2 + descender}
+						stroke="black"
+						stroke-opacity=".3"
 					/>
 				</svg>
-			</Glyph>
-		{/key}
+			{/key}
+		</Glyph>
 		<!-- <input type="range" min={100} max={900} bind:value={fontWeight} /> -->
 		<div class="my-20">
 			<ButtonPanel fontNames={fontOptions} correctOption={fontName} />
@@ -231,7 +256,7 @@
 				</div>
 			</div>
 		{/key}
-		{#key spinReloadFont}
+		{#key updateFontKey}
 			<div on:click={reloadFont} class="relative w-1/2 border py-3">
 				<div class="w-max mx-auto flex-col items-center text-center" in:slide={{ duration: 500 }}>
 					<TextAa weight="bold" size={60} />
@@ -244,7 +269,7 @@
 	</div>
 {/if}
 
-<canvas class="w-[200px] h-[200px] border" />
+<canvas class="border hidden absolute" width="400" height="200" />
 
 <svelte:head>
 	<title>Font Guesser</title>
