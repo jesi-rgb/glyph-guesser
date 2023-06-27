@@ -16,6 +16,8 @@
 	import ButtonPanel from '../lib/Components/ButtonPanel.svelte';
 	import Glyph from '../lib/Components/Glyph.svelte';
 
+	const filteredFonts = fonts.filter((f) => !f.family.startsWith('Noto '));
+
 	let options = {
 		duration: 700,
 		easing: niceBounce
@@ -24,7 +26,7 @@
 	// not used for now...
 	let charSet = 'abcdefghijklmnopqrstuvwxyz1234567890.,:;-';
 	// let charIndex = randomChoice(charSet);
-	let selectedFont = randomChoice(fonts);
+	let selectedFont = randomChoice(filteredFonts);
 
 	let updateWordKey = {};
 	let spinReloadChar = {};
@@ -60,7 +62,7 @@
 
 	const reloadFont = () => {
 		// charIndex = Math.floor(Math.random() * charSet.length);
-		selectedFont = randomChoice(fonts);
+		selectedFont = randomChoice(filteredFonts);
 		fetchWords();
 		xHeight = getXHeight(selectedFont, selectedWord, fontSize).xHeight;
 		ascender = getXHeight(selectedFont, selectedWord, fontSize).ascender;
