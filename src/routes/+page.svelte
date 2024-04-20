@@ -3,6 +3,8 @@
 	import { cubicIn } from 'svelte/easing';
 	import { ArrowCounterClockwise, TextAa } from 'phosphor-svelte';
 
+	import { Toaster } from 'svelte-sonner';
+
 	import {
 		spin,
 		niceBounce,
@@ -273,6 +275,7 @@
 {/if}
 
 <canvas class="border hidden absolute" width="400" height="200" />
+<Toaster richColors position="top-right" />
 
 <svelte:head>
 	<title>Font Guesser</title>
